@@ -176,7 +176,7 @@ class _StartAssessmentPageState extends State<StartAssessmentPage> with SingleTi
                   "Update Assessment",
                   style: TextStyle(
                     fontSize: 18,
-                    color: Colors.green,
+                    color: Colors.blue,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
