@@ -89,7 +89,7 @@ class _ProfilePageState extends State<ProfilePage> {
         backgroundColor: const Color(0xFF00274D), // Dark blue background
         appBar: AppBar(
           backgroundColor: const Color(0xFF00274D), // Match the background color
-          title: const Text("QSAT Connect", style: TextStyle(color: Colors.white)),
+          title: Text("| QSAT Connect |", style: GoogleFonts.monomaniacOne(color: Colors.white)),
           centerTitle: true,
         ),
         body: Column(
@@ -114,7 +114,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     children: [
                       CircleAvatar(
                         radius: 50,
-                        backgroundImage: AssetImage("assets/doctor_image.png"), // Doctor's profile image
+                        backgroundImage: AssetImage("assets/doctor.png"), // Doctor's profile image
                       ),
                       const SizedBox(width: 16),
                       Column(

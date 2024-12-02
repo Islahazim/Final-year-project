@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
@@ -97,11 +98,11 @@ class _StartAssessmentPageState extends State<StartAssessmentPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
+        title: Text(
           "Start Assessment",
-          style: TextStyle(fontSize: 20, color: Colors.black),
+          style: GoogleFonts.monomaniacOne(color: Colors.white),
         ),
-        backgroundColor: Colors.white,
+        backgroundColor: const Color(0xFF00274D),
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.black),
@@ -111,59 +112,59 @@ class _StartAssessmentPageState extends State<StartAssessmentPage> {
         ),
         centerTitle: true,
       ),
-      body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              Color(0xFFA7FFEB), // Light cyan
-              Color(0xFF1DE9B6), // Teal
-            ],
-          ),
-        ),
-        child: Center(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                if (_isProcessing) const CircularProgressIndicator(),
-                if (!_isProcessing) ...[
-                  ElevatedButton(
-                    onPressed: () => _startAssessment(context),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF00BFA5),
-                      minimumSize: const Size(double.infinity, 60), // Full width, fixed height
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30),
-                      ),
-                    ),
-                    child: const Text(
-                      "Start Assessment",
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  ElevatedButton(
-                    onPressed: () => _updateAssessment(context),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF00BFA5),
-                      minimumSize: const Size(double.infinity, 60), // Full width, fixed height
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30),
-                      ),
-                    ),
-                    child: const Text(
-                      "Update",
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                ],
-              ],
+      body: Stack(
+        children: [
+          // Background GIF
+          Positioned.fill(
+            child: Image.asset(
+              'assets/myowave.gif', // Path to your GIF
+              fit: BoxFit.cover,
             ),
           ),
-        ),
+          // Foreground content
+          Center(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  if (_isProcessing) const CircularProgressIndicator(),
+                  if (!_isProcessing) ...[
+                    ElevatedButton(
+                      onPressed: () => _startAssessment(context),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.white60,
+                        minimumSize: const Size(double.infinity, 60), // Full width, fixed height
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                      ),
+                      child: Text(
+                        "Start Assessment",
+                        style: GoogleFonts.monomaniacOne(color: Colors.deepPurple, fontSize: 20, fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    ElevatedButton(
+                      onPressed: () => _updateAssessment(context),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.white60,
+                        minimumSize: const Size(double.infinity, 60), // Full width, fixed height
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                      ),
+                      child: Text(
+                        "Update",
+                        style: GoogleFonts.monomaniacOne(color: Colors.deepPurple, fontSize: 20, fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

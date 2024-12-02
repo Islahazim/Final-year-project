@@ -26,10 +26,10 @@ class PatientDetailsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF00274D), // Background color (beige shade)
+      backgroundColor: Colors.blueGrey, // Background color (beige shade)
       appBar: AppBar(
-        backgroundColor: const Color(0xFF6EE7DC), // App bar background
-        title: Text("Patient: $name", style: GoogleFonts.monomaniacOne(color: Colors.black)),
+        backgroundColor: const Color(0xFF00274D), // App bar background
+        title: Text("Patient: $name", style: GoogleFonts.monomaniacOne(color: Colors.white)),
         centerTitle: true,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.black),
@@ -134,23 +134,23 @@ class PatientDetailsPage extends StatelessWidget {
                   child: Container(
                     height: 100,
                     decoration: BoxDecoration(
-                      color: const Color(0xFF6EE7DC),
+                      color: const Color(0xFF00274D),
                       borderRadius: BorderRadius.circular(16),
                       border: Border.all(color: Colors.black26),
                     ),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text('17', style: GoogleFonts.monomaniacOne(fontSize: 32)),
+                        Text('17', style: GoogleFonts.monomaniacOne(color: Colors.white, fontSize: 32)),
                         Text('March 2025',
-                            style: GoogleFonts.monomaniacOne(fontSize: 16)),
+                            style: GoogleFonts.monomaniacOne(color: Colors.white, fontSize: 16)),
                       ],
                     ),
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 5),
+            const SizedBox(height: 10),
             // Patient Assessment Section
             SizedBox(
               width: double.infinity,
@@ -174,7 +174,7 @@ class PatientDetailsPage extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.symmetric(vertical: 8.0),
                       decoration: const BoxDecoration(
-                        color: Color(0xFF6EE7DC), // Aqua background for header
+                        color: Color(0xFF00274D), // Aqua background for header
                         borderRadius: BorderRadius.only(
                           topLeft: Radius.circular(16),
                           topRight: Radius.circular(16),
@@ -185,7 +185,7 @@ class PatientDetailsPage extends StatelessWidget {
                         textAlign: TextAlign.center,
                         style: GoogleFonts.monomaniacOne(
                           fontSize: 18,
-                          color: Colors.black,
+                          color: Colors.white,
                         ),
                       ),
                     ),
@@ -239,7 +239,7 @@ class PatientDetailsPage extends StatelessWidget {
                 ),
               ),
             ),
-            const SizedBox(height: 5),
+            const SizedBox(height: 10),
             // Start Assessment Button
             SizedBox(
               width: double.infinity,
@@ -256,7 +256,7 @@ class PatientDetailsPage extends StatelessWidget {
                   );
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF6EE7DC),
+                  backgroundColor: const Color(0xFF00274D),
                   padding: const EdgeInsets.symmetric(vertical: 16.0),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16),
@@ -267,7 +267,7 @@ class PatientDetailsPage extends StatelessWidget {
                   textAlign: TextAlign.center,
                   style: GoogleFonts.monomaniacOne(
                     fontSize: 16,
-                    color: Colors.black,
+                    color: Colors.white,
                   ),
                 ),
               ),
