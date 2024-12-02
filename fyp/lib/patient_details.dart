@@ -26,7 +26,7 @@ class PatientDetailsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFB29577), // Background color (beige shade)
+      backgroundColor: const Color(0xFF00274D), // Background color (beige shade)
       appBar: AppBar(
         backgroundColor: const Color(0xFF6EE7DC), // App bar background
         title: Text("Patient: $name", style: GoogleFonts.monomaniacOne(color: Colors.black)),
@@ -76,15 +76,15 @@ class PatientDetailsPage extends StatelessWidget {
                 ),
               ),
             ),
-            const SizedBox(height: 5),
+            const SizedBox(height: 10),
             // Graph Section
             SizedBox(
               width: double.infinity,
               child: Container(
-                height: 200,
+                height: 210,
                 padding: const EdgeInsets.all(8.0),
                 decoration: BoxDecoration(
-                  color: Colors.white24,
+                  color: Colors.white,
                   borderRadius: BorderRadius.circular(16),
                   border: Border.all(color: Colors.black26),
                 ),
@@ -93,7 +93,7 @@ class PatientDetailsPage extends StatelessWidget {
                   series: <CartesianSeries<dynamic, dynamic>>[
                     ColumnSeries<ChartData, String>(
                       dataSource: [
-                        ChartData('17 dec 24', ml),
+                        ChartData('17 Dec 24', ml),
                         ChartData('17 Jan 25', ml),
                         ChartData('17 Feb 25', ml),
                       ],
@@ -102,11 +102,10 @@ class PatientDetailsPage extends StatelessWidget {
                       color: Colors.pink,
                     )
                   ],
-
                 ),
               ),
             ),
-            const SizedBox(height: 5),
+            const SizedBox(height: 10),
             // MAS Level and Next Appointment Section
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -121,7 +120,7 @@ class PatientDetailsPage extends StatelessWidget {
                     ),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
-                      children:[
+                      children: [
                         Text('$ml', style: GoogleFonts.monomaniacOne(fontSize: 32)),
                         Text('Current\nMAS LEVEL',
                             textAlign: TextAlign.center,
@@ -141,7 +140,7 @@ class PatientDetailsPage extends StatelessWidget {
                     ),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
-                      children:[
+                      children: [
                         Text('17', style: GoogleFonts.monomaniacOne(fontSize: 32)),
                         Text('March 2025',
                             style: GoogleFonts.monomaniacOne(fontSize: 16)),
@@ -190,8 +189,52 @@ class PatientDetailsPage extends StatelessWidget {
                         ),
                       ),
                     ),
-                    // Content Area
-                    const SizedBox(height: 100), // Placeholder for content or empty space
+                    // Content Area - Dynamic Assessment
+                    Container(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Builder(
+                        builder: (context) {
+                          switch (ml) {
+                            case 0:
+                              return Text(
+                                "Critical condition. Emergency intervention needed.",
+                                style: GoogleFonts.monomaniacOne(fontSize: 16, color: Colors.black),
+                                textAlign: TextAlign.center,
+                              );
+                            case 1:
+                              return Text(
+                                "Severe concerns detected. Immediate action required.",
+                                style: GoogleFonts.monomaniacOne(fontSize: 16, color: Colors.black),
+                                textAlign: TextAlign.center,
+                              );
+                            case 2:
+                              return Text(
+                                "Moderate issues present. Recommend scheduling a follow-up.",
+                                style: GoogleFonts.monomaniacOne(fontSize: 16, color: Colors.black),
+                                textAlign: TextAlign.center,
+                              );
+                            case 3:
+                              return Text(
+                                "Minor irregularities observed. Monitor progress closely.",
+                                style: GoogleFonts.monomaniacOne(fontSize: 16, color: Colors.red),
+                                textAlign: TextAlign.center,
+                              );
+                            case 4:
+                              return Text(
+                                "No issues detected. Patient is in excellent condition.",
+                                style: GoogleFonts.monomaniacOne(fontSize: 16, color: Colors.red),
+                                textAlign: TextAlign.center,
+                              );
+                            default:
+                              return Text(
+                                "Unknown case: Please check the input data.",
+                                style: GoogleFonts.monomaniacOne(fontSize: 16, color: Colors.black),
+                                textAlign: TextAlign.center,
+                              );
+                          }
+                        },
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -220,10 +263,12 @@ class PatientDetailsPage extends StatelessWidget {
                   ),
                 ),
                 child: Text(
-                    'Start Assessment', textAlign: TextAlign.center,
-                    style: GoogleFonts.monomaniacOne(
-                        fontSize: 16,
-                        color: Colors.black)
+                  'Start Assessment',
+                  textAlign: TextAlign.center,
+                  style: GoogleFonts.monomaniacOne(
+                    fontSize: 16,
+                    color: Colors.black,
+                  ),
                 ),
               ),
             ),

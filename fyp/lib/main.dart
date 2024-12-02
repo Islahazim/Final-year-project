@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'home_screen.dart';
+import 'login_page.dart';
+import 'register_page.dart';
 import 'patient_records_page2.dart';
 import 'profile_page.dart';
 
@@ -18,60 +19,10 @@ class QSATApp extends StatelessWidget {
         primarySwatch: Colors.blue,  // Update with your primary color
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: const QSATHomePage(),
+      home: const LoginPage(),
       routes: {
-        '/home': (context) => const HomePage(),
-        // '/patientRecords': (context) => const PatientRecordsPage(),
-        '/profile': (context) => const ProfilePage(),
+        '/register': (context) => const RegisterPage(),
       },
-    );
-  }
-}
-
-class QSATHomePage extends StatefulWidget {
-  const QSATHomePage({super.key});
-
-  @override
-  QSATHomePageState createState() => QSATHomePageState();
-}
-
-class QSATHomePageState extends State<QSATHomePage> {
-  int _selectedIndex = 0;
-
-  final List<Widget> _pages = [
-    const HomePage(),
-     const PatientRecordsPage(),
-    const ProfilePage(),
-  ];
-
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: _pages[_selectedIndex],
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _selectedIndex,
-        onTap: _onItemTapped,
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.article),
-            label: 'Patient Records',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Profile',
-          ),
-        ],
-      ),
     );
   }
 }

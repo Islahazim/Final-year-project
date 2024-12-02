@@ -14,7 +14,10 @@ class PatientRecordsPage extends StatefulWidget {
 
 class _PatientRecordsPageState extends State<PatientRecordsPage> {
   List<Map<String, dynamic>> patientRecords = [];
+  List<Map<String, dynamic>> filteredRecords = [];
   bool isLoading = true;
+  String searchQuery = '';
+  String selectedGender = 'All';
 
   @override
   void initState() {
@@ -42,6 +45,7 @@ class _PatientRecordsPageState extends State<PatientRecordsPage> {
               'ml': item['Mas Level'] ?? 'N/A',
             };
           }));
+          filteredRecords = List.from(patientRecords);
           isLoading = false;
         });
       } else {
@@ -53,6 +57,21 @@ class _PatientRecordsPageState extends State<PatientRecordsPage> {
         isLoading = false;
       });
     }
+  }
+
+  void _filterRecords() {
+    setState(() {
+      filteredRecords = patientRecords.where((record) {
+        final matchesQuery = record['name']
+            .toString()
+            .toLowerCase()
+            .contains(searchQuery.toLowerCase()) ||
+            record['id'].toString().contains(searchQuery);
+        final matchesGender = selectedGender == 'All' ||
+            record['gender'].toString().toLowerCase() == selectedGender.toLowerCase();
+        return matchesQuery && matchesGender;
+      }).toList();
+    });
   }
 
   @override
@@ -73,42 +92,97 @@ class _PatientRecordsPageState extends State<PatientRecordsPage> {
             ],
           ),
         ),
-        child: isLoading
-            ? const Center(child: CircularProgressIndicator())
-            : patientRecords.isEmpty
-            ? const Center(child: Text("No patient records found."))
-            : ListView.builder(
-          padding: const EdgeInsets.all(16.0),
-          itemCount: patientRecords.length,
-          itemBuilder: (context, index) {
-            final patient = patientRecords[index];
-            return Card(
-              margin: const EdgeInsets.symmetric(vertical: 8.0),
-              child: ListTile(
-                title: Text(patient['name'] ?? 'Unknown', style: GoogleFonts.monomaniacOne(color: Colors.black)),
-                subtitle: Text("ID: ${patient['id']} • Age: ${patient['age']} • Gender: ${patient['gender']}"),
-                trailing: const Icon(Icons.arrow_forward),
-                onTap: () {
-                  // Navigate to PatientDetailsPage with patient details
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => PatientDetailsPage(
-                        patientID: patient['id'],
-                        name: patient['name'],
-                        age: patient['age'],
-                        gender: patient['gender'],
-                        phoneNum: patient['phoneNum'],
-                        email: patient['email'],
-                        ml: patient['ml'],
-
+        child: Column(
+          children: [
+            // Search and Filter Bar
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Row(
+                children: [
+                  // Search Bar
+                  Expanded(
+                    child: TextField(
+                      onChanged: (value) {
+                        searchQuery = value;
+                        _filterRecords();
+                      },
+                      decoration: InputDecoration(
+                        prefixIcon: const Icon(Icons.search),
+                        hintText: "Search by name or ID",
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
                       ),
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  // Filter Bar
+                  DropdownButton<String>(
+                    value: selectedGender,
+                    items: ['All', 'Male', 'Female']
+                        .map(
+                          (gender) => DropdownMenuItem(
+                        value: gender,
+                        child: Text(gender),
+                      ),
+                    )
+                        .toList(),
+                    onChanged: (value) {
+                      setState(() {
+                        selectedGender = value!;
+                        _filterRecords();
+                      });
+                    },
+                    borderRadius: BorderRadius.circular(16),
+                    underline: Container(),
+                  ),
+                ],
+              ),
+            ),
+            // Patient Records List
+            Expanded(
+              child: isLoading
+                  ? const Center(child: CircularProgressIndicator())
+                  : filteredRecords.isEmpty
+                  ? const Center(child: Text("No patient records found."))
+                  : ListView.builder(
+                padding: const EdgeInsets.all(16.0),
+                itemCount: filteredRecords.length,
+                itemBuilder: (context, index) {
+                  final patient = filteredRecords[index];
+                  return Card(
+                    margin: const EdgeInsets.symmetric(vertical: 8.0),
+                    child: ListTile(
+                      title: Text(
+                        patient['name'] ?? 'Unknown',
+                        style: GoogleFonts.monomaniacOne(color: Colors.black),
+                      ),
+                      subtitle: Text(
+                          "ID: ${patient['id']} • Age: ${patient['age']} • Gender: ${patient['gender']}"),
+                      trailing: const Icon(Icons.arrow_forward),
+                      onTap: () {
+                        // Navigate to PatientDetailsPage with patient details
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => PatientDetailsPage(
+                              patientID: patient['id'],
+                              name: patient['name'],
+                              age: patient['age'],
+                              gender: patient['gender'],
+                              phoneNum: patient['phoneNum'],
+                              email: patient['email'],
+                              ml: patient['ml'],
+                            ),
+                          ),
+                        );
+                      },
                     ),
                   );
                 },
               ),
-            );
-          },
+            ),
+          ],
         ),
       ),
       floatingActionButton: FloatingActionButton(
