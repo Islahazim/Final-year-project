@@ -39,7 +39,7 @@ dependencies:
   syncfusion_flutter_charts: ^27.2.4
   google_fonts: ^6.2.1
   mqtt_client: ^9.6.1
-  fl_chart: ^0.50.1
+  fl_chart: ^0.69.2
 
 dev_dependencies:
   flutter_test:
