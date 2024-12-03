@@ -42,114 +42,196 @@ class PatientDetailsPage extends StatelessWidget {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            // Patient Basic Information
-            SizedBox(
-              width: double.infinity,
-              child: Container(
-                padding: const EdgeInsets.all(16.0),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(16),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey.withOpacity(0.3),
-                      blurRadius: 6,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text("Name: $name", style: GoogleFonts.monomaniacOne(fontSize: 18)),
-                    const SizedBox(height: 5),
-                    Text("Patient ID: $patientID", style: GoogleFonts.monomaniacOne(fontSize: 16)),
-                    const SizedBox(height: 5),
-                    Text("Age: $age", style: GoogleFonts.monomaniacOne(fontSize: 18)),
-                    const SizedBox(height: 5),
-                    Text("Gender: $gender", style: GoogleFonts.monomaniacOne(fontSize: 16)),
-                    const SizedBox(height: 5),
-                    Text("Phone Number: $phoneNum", style: GoogleFonts.monomaniacOne(fontSize: 16)),
-                    const SizedBox(height: 5),
-                    Text("Email: $email", style: GoogleFonts.monomaniacOne(fontSize: 16)),
-                  ],
-                ),
-              ),
-            ),
-            const SizedBox(height: 10),
-            // Graph Section
-            SizedBox(
-              width: double.infinity,
-              child: Container(
-                height: 210,
-                padding: const EdgeInsets.all(8.0),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: Colors.black26),
-                ),
-                child: SfCartesianChart(
-                  primaryXAxis: CategoryAxis(),
-                  series: <CartesianSeries<dynamic, dynamic>>[
-                    ColumnSeries<ChartData, String>(
-                      dataSource: [
-                        ChartData('17 Dec 24', ml),
-                        ChartData('17 Jan 25', ml),
-                        ChartData('17 Feb 25', ml),
-                      ],
-                      xValueMapper: (ChartData data, _) => data.x,
-                      yValueMapper: (ChartData data, _) => data.y,
-                      color: Colors.pink,
-                    )
-                  ],
-                ),
-              ),
-            ),
-            const SizedBox(height: 10),
-            // MAS Level and Next Appointment Section
+            // Patient Basic Information and Button
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Expanded(
+                  flex: 2,
                   child: Container(
-                    height: 100,
+                    padding: const EdgeInsets.all(16.0),
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: Colors.black26),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.3),
+                          blurRadius: 6,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
                     ),
                     child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('$ml', style: GoogleFonts.monomaniacOne(fontSize: 32)),
-                        Text('Current\nMAS LEVEL',
-                            textAlign: TextAlign.center,
-                            style: GoogleFonts.monomaniacOne(fontSize: 16)),
+                        Text("Name: $name", style: GoogleFonts.monomaniacOne(fontSize: 18)),
+                        Text("Patient ID: $patientID", style: GoogleFonts.monomaniacOne(fontSize: 16)),
+                        Text("Age: $age", style: GoogleFonts.monomaniacOne(fontSize: 18)),
+                        Text("Gender: $gender", style: GoogleFonts.monomaniacOne(fontSize: 16)),
+                        Text("Phone Number: $phoneNum", style: GoogleFonts.monomaniacOne(fontSize: 16)),
+                        Text("Email: $email", style: GoogleFonts.monomaniacOne(fontSize: 16)),
                       ],
                     ),
                   ),
                 ),
-                const SizedBox(width: 5),
+                const SizedBox(width: 8),
+                // Start Assessment Button
                 Expanded(
-                  child: Container(
-                    height: 100,
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF00274D),
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: Colors.black26),
+                  flex: 1,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => StartAssessmentPage(
+                            patientId: patientID,
+                            patientName: name,
+                          ),
+                        ),
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF00274D),
+                      padding: const EdgeInsets.symmetric(vertical: 16.0),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
                     ),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text('17', style: GoogleFonts.monomaniacOne(color: Colors.white, fontSize: 32)),
-                        Text('March 2025',
-                            style: GoogleFonts.monomaniacOne(color: Colors.white, fontSize: 16)),
-                      ],
+                    child: Text(
+                      'Start New Assessment',
+                      textAlign: TextAlign.center,
+                      style: GoogleFonts.monomaniacOne(
+                        fontSize: 16,
+                        color: Colors.white,
+                      ),
                     ),
                   ),
                 ),
               ],
             ),
+            const SizedBox(height: 10),
+            // Graph Section
+            // Graph Section with MAS Level and Next Appointment
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Graph Section
+                Expanded(
+                  flex: 2, // Take more space for the graph
+                  child: Container(
+                    height: 210,
+                    padding: const EdgeInsets.all(8.0),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: Colors.black26),
+                    ),
+                    child: SfCartesianChart(
+                      title: ChartTitle(
+                        text: 'MAS Level Progress',
+                        textStyle: GoogleFonts.monomaniacOne(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                        ),
+                      ),
+                      primaryXAxis: CategoryAxis(
+                        labelStyle: TextStyle(
+                          fontSize: 14,
+                          color: Colors.blue, // Customize color
+                          fontWeight: FontWeight.bold,
+                        ),
+                        title: AxisTitle(
+                          text: 'Date',
+                          textStyle: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                          ),
+                        ),
+                      ),
+                      primaryYAxis: NumericAxis(
+                        labelStyle: TextStyle(
+                          fontSize: 14,
+                          color: Colors.green, // Customize color
+                          fontWeight: FontWeight.bold,
+                        ),
+                        title: AxisTitle(
+                          text: 'MAS Level',
+                          textStyle: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                          ),
+                        ),
+                      ),
+                      series: <CartesianSeries>[
+                        ColumnSeries<ChartData, String>(
+                          dataSource: [
+                            ChartData('17 Dec 24', ml),
+                            ChartData('17 Jan 25', ml),
+                            ChartData('17 Feb 25', ml),
+                          ],
+                          xValueMapper: (ChartData data, _) => data.x,
+                          yValueMapper: (ChartData data, _) => data.y,
+                          color: Colors.pink,
+                        ),
+                      ],
+                    )
+                  ),
+                ),
+                const SizedBox(width: 8), // Spacing between the graph and the containers
+                // MAS Level and Next Appointment Section
+                Expanded(
+                  flex: 1, // Take less space for the two containers
+                  child: Column(
+                    children: [
+                      // Current MAS Level
+                      Container(
+                        height: 210/2,
+                        width: 400,
+                        margin: const EdgeInsets.only(bottom: 8), // Add space between the two containers
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(color: Colors.black26),
+                        ),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text('$ml', style: GoogleFonts.monomaniacOne(fontSize: 32)),
+                            Text(
+                              'Current\nMAS LEVEL',
+                              textAlign: TextAlign.center,
+                              style: GoogleFonts.monomaniacOne(fontSize: 16),
+                            ),
+                          ],
+                        ),
+                      ),
+                      // Next Appointment
+                      Container(
+                        height: 196/2,
+                        width: 400,
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF00274D),
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(color: Colors.black26),
+                        ),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text('17', style: GoogleFonts.monomaniacOne(color: Colors.white, fontSize: 32)),
+                            Text('March 2025', style: GoogleFonts.monomaniacOne(color: Colors.white, fontSize: 16)),
+                            Text('Next Appointment', style: GoogleFonts.monomaniacOne(color: Colors.white, fontSize: 16)),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+
             const SizedBox(height: 10),
             // Patient Assessment Section
             SizedBox(
@@ -191,7 +273,7 @@ class PatientDetailsPage extends StatelessWidget {
                     ),
                     // Content Area - Dynamic Assessment
                     Container(
-                      padding: const EdgeInsets.all(16.0),
+                      padding: const EdgeInsets.all(38.0),
                       child: Builder(
                         builder: (context) {
                           switch (ml) {
@@ -236,39 +318,6 @@ class PatientDetailsPage extends StatelessWidget {
                       ),
                     ),
                   ],
-                ),
-              ),
-            ),
-            const SizedBox(height: 10),
-            // Start Assessment Button
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => StartAssessmentPage(
-                        patientId: patientID,
-                        patientName: name,
-                      ),
-                    ),
-                  );
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF00274D),
-                  padding: const EdgeInsets.symmetric(vertical: 16.0),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                ),
-                child: Text(
-                  'Start Assessment',
-                  textAlign: TextAlign.center,
-                  style: GoogleFonts.monomaniacOne(
-                    fontSize: 16,
-                    color: Colors.white,
-                  ),
                 ),
               ),
             ),
