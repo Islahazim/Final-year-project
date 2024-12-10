@@ -50,6 +50,7 @@ class _ProfilePageState extends State<ProfilePage> {
               'phoneNum': item['phoneNumber'] ?? 'N/A',
               'email': item['email'] ?? 'N/A',
               'ml': item['MasLevel'] ?? 'N/A',
+              'appointment': item['appointmentDate'] ?? 'N/A',
             };
           }));
           filteredRecords = List.from(patientRecords);
@@ -303,6 +304,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                         phoneNum: patient['phoneNum'],
                                         email: patient['email'],
                                         ml: patient['ml'],
+                                        appointment: patient['appointment'],
                                       ),
                                     ),
                                   );
@@ -315,10 +317,28 @@ class _ProfilePageState extends State<ProfilePage> {
                     ],
                   ),
                   // Appointment Tab
-                  const Center(
-                    child: Text(
-                      "Appointments Coming Soon",
-                      style: TextStyle(color: Colors.white, fontSize: 18),
+                  Expanded(
+                    child: isLoading
+                        ? const Center(child: CircularProgressIndicator())
+                        : filteredRecords.isEmpty
+                        ? const Center(child: Text("No appointment found."))
+                        : ListView.builder(
+                      padding: const EdgeInsets.all(16.0),
+                      itemCount: filteredRecords.length,
+                      itemBuilder: (context, index) {
+                        final patient = filteredRecords[index];
+                        return Card(
+                          margin: const EdgeInsets.symmetric(vertical: 8.0),
+                          child: ListTile(
+                            title: Text(
+                              patient['name'] ?? 'Unknown',
+                              style: GoogleFonts.monomaniacOne(color: Colors.black),
+                            ),
+                            subtitle: Text(
+                                "ID: ${patient['id']} • Date: ${patient['appointment']}"),
+                          ),
+                        );
+                      },
                     ),
                   ),
                 ],

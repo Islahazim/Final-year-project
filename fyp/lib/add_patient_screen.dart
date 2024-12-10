@@ -38,6 +38,7 @@ class _AddPatientScreenState extends State<AddPatientScreen> {
           'gender': selectedGender,
           'patientIssues': patientIssues,
           'MasLevel': 0,
+          'appointmentDate': "",
         }),
       );
 

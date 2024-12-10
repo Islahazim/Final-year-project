@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'login_page.dart';
 import 'register_page.dart';
-import 'patient_records_page2.dart';
-import 'profile_page.dart';
 
 void main() {
   runApp(const QSATApp());

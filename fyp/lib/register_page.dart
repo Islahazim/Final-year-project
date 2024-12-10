@@ -7,14 +7,14 @@ class RegisterPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final _formKey = GlobalKey<FormState>();
+    final formKey = GlobalKey<FormState>();
     final nameController = TextEditingController();
     final emailController = TextEditingController();
     final passwordController = TextEditingController();
     final confirmPasswordController = TextEditingController();
     final doctorIDController = TextEditingController(); // New controller for Doctor ID
 
-    Future<void> _registerUser() async {
+    Future<void> registerUser() async {
       final apiUrl = 'http://ec2-18-139-163-163.ap-southeast-1.compute.amazonaws.com:3000/register'; // Replace with your EC2 URL
       final user = {
         "name": nameController.text,
@@ -59,7 +59,7 @@ class RegisterPage extends StatelessWidget {
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(16.0),
           child: Form(
-            key: _formKey,
+            key: formKey,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -171,8 +171,8 @@ class RegisterPage extends StatelessWidget {
                 // Register Button
                 ElevatedButton(
                   onPressed: () {
-                    if (_formKey.currentState!.validate()) {
-                      _registerUser();
+                    if (formKey.currentState!.validate()) {
+                      registerUser();
                     }
                   },
                   style: ElevatedButton.styleFrom(

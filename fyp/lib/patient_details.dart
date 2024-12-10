@@ -1,7 +1,9 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'start_assessment2.dart'; // Import the updated StartAssessmentPage
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:http/http.dart' as http;
 
 class PatientDetailsPage extends StatelessWidget {
   final String patientID;
@@ -11,6 +13,7 @@ class PatientDetailsPage extends StatelessWidget {
   final String phoneNum;
   final String email;
   final int ml;
+  final String appointment;
 
   const PatientDetailsPage({
     super.key,
@@ -21,7 +24,33 @@ class PatientDetailsPage extends StatelessWidget {
     required this.phoneNum,
     required this.email,
     required this.ml,
+    required this.appointment,
   });
+
+  Future<bool> saveAppointmentDate(String patientId, String date) async {
+    const apiUrl = 'http://ec2-18-139-163-163.ap-southeast-1.compute.amazonaws.com:3000/save-appointment';
+
+    try {
+      final response = await http.post(
+        Uri.parse(apiUrl),
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode({
+          "patientId": patientId,
+          "appointmentDate": date,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        return true; // Successfully saved
+      } else {
+        print("Error: ${response.body}");
+        return false; // Failed to save
+      }
+    } catch (e) {
+      print("Error saving appointment: $e");
+      return false;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -78,39 +107,89 @@ class PatientDetailsPage extends StatelessWidget {
                 // Start Assessment Button
                 Expanded(
                   flex: 1,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => StartAssessmentPage(
-                            patientId: patientID,
-                            patientName: name,
+                  child: Column(
+                    children: [
+                      ElevatedButton(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => StartAssessmentPage(
+                                patientId: patientID,
+                                patientName: name,
+                              ),
+                            ),
+                          );
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF00274D),
+                          padding: const EdgeInsets.symmetric(horizontal: 40,vertical: 16.0),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
                           ),
                         ),
-                      );
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF00274D),
-                      padding: const EdgeInsets.symmetric(vertical: 16.0),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
+                        child: Text(
+                          'Start New Assessment',
+                          textAlign: TextAlign.center,
+                          style: GoogleFonts.monomaniacOne(
+                            fontSize: 16,
+                            color: Colors.white,
+                          ),
+                        ),
                       ),
-                    ),
-                    child: Text(
-                      'Start New Assessment',
-                      textAlign: TextAlign.center,
-                      style: GoogleFonts.monomaniacOne(
-                        fontSize: 16,
-                        color: Colors.white,
+                      const SizedBox(height: 10),
+                      GestureDetector(
+                        onTap: () async {
+                          DateTime? selectedDate = await showDatePicker(
+                            context: context,
+                            initialDate: DateTime.now(),
+                            firstDate: DateTime.now(),
+                            lastDate: DateTime(2100),
+                          );
+
+                          if (selectedDate != null) {
+                            String formattedDate =
+                                "${selectedDate.day}-${selectedDate.month}-${selectedDate.year}";
+                            bool success = await saveAppointmentDate(patientID, formattedDate);
+
+                            if (success) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(content: Text('Appointment date saved successfully!')),
+                              );
+                            } else {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(content: Text('Failed to save appointment date.')),
+                              );
+                            }
+                          }
+                        },
+                        child: Container(
+                          height: 110,
+                          width: double.infinity,
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF004D79),
+                            borderRadius: BorderRadius.circular(16),
+                            border: Border.all(color: Colors.black26),
+                          ),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Icon(Icons.calendar_today, color: Colors.white, size: 20),
+                              const SizedBox(height: 5),
+                              Text(
+                                'Select Appointment',
+                                style: GoogleFonts.monomaniacOne(color: Colors.white, fontSize: 14),
+                              ),
+                            ],
+                          ),
+                        ),
                       ),
-                    ),
+                    ],
                   ),
                 ),
               ],
             ),
             const SizedBox(height: 10),
-            // Graph Section
             // Graph Section with MAS Level and Next Appointment
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -177,7 +256,7 @@ class PatientDetailsPage extends StatelessWidget {
                           color: Colors.pink,
                         ),
                       ],
-                    )
+                    ),
                   ),
                 ),
                 const SizedBox(width: 8), // Spacing between the graph and the containers
@@ -188,7 +267,7 @@ class PatientDetailsPage extends StatelessWidget {
                     children: [
                       // Current MAS Level
                       Container(
-                        height: 210/2,
+                        height: 210 / 2,
                         width: 400,
                         margin: const EdgeInsets.only(bottom: 8), // Add space between the two containers
                         decoration: BoxDecoration(
@@ -210,7 +289,7 @@ class PatientDetailsPage extends StatelessWidget {
                       ),
                       // Next Appointment
                       Container(
-                        height: 196/2,
+                        height: 196 / 2,
                         width: 400,
                         decoration: BoxDecoration(
                           color: const Color(0xFF00274D),
@@ -220,8 +299,7 @@ class PatientDetailsPage extends StatelessWidget {
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Text('17', style: GoogleFonts.monomaniacOne(color: Colors.white, fontSize: 32)),
-                            Text('March 2025', style: GoogleFonts.monomaniacOne(color: Colors.white, fontSize: 16)),
+                            Text(appointment, style: GoogleFonts.monomaniacOne(color: Colors.white, fontSize: 32)),
                             Text('Next Appointment', style: GoogleFonts.monomaniacOne(color: Colors.white, fontSize: 16)),
                           ],
                         ),
@@ -231,7 +309,6 @@ class PatientDetailsPage extends StatelessWidget {
                 ),
               ],
             ),
-
             const SizedBox(height: 10),
             // Patient Assessment Section
             SizedBox(
