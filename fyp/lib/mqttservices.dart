@@ -12,7 +12,7 @@ class MQTTService {
 
   final client = MqttServerClient.withPort(
     '1dd4053fd4a4443b9810ba948789a0f8.s1.eu.hivemq.cloud',
-    'flutter_client_3',
+    'qset_client',
     8883,
   );
 
@@ -28,7 +28,7 @@ class MQTTService {
 
     try {
       print("Attempting to connect...");
-      await client.connect(username, password);
+      await client.connect('Islahuddin','Bactidol');
       print("Connection successful");
 
       if (client.connectionStatus?.state == mqtt.MqttConnectionState.connected) {

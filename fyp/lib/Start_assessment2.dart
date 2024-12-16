@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'mqttservices.dart'; // Import your MQTTService
 
 class StartAssessmentPage extends StatefulWidget {
   final String patientId;
@@ -18,6 +19,8 @@ class StartAssessmentPage extends StatefulWidget {
 }
 
 class _StartAssessmentPageState extends State<StartAssessmentPage> {
+  final MQTTService mqttService = MQTTService();
+  String _subscribedData = ""; // Variable to store subscribed data
   bool _isProcessing = false;
 
   // API URLs
@@ -27,6 +30,18 @@ class _StartAssessmentPageState extends State<StartAssessmentPage> {
       "http://ec2-18-139-163-163.ap-southeast-1.compute.amazonaws.com:3000/update-assessment";
   static const String _stopAssessmentUrl =
       "http://ec2-18-139-163-163.ap-southeast-1.compute.amazonaws.com:3000/stop-assessment";
+
+  @override
+  void initState() {
+    super.initState();
+
+    // Initialize MQTT and subscribe to updates
+    mqttService.onMotionStatusReceived = (message) {
+      setState(() {
+        _subscribedData = message; // Update the state with received data
+      });
+    };
+  }
 
   Future<void> _startAssessment(BuildContext context) async {
     setState(() {
@@ -166,6 +181,17 @@ class _StartAssessmentPageState extends State<StartAssessmentPage> {
                 children: [
                   if (_isProcessing) const CircularProgressIndicator(),
                   if (!_isProcessing) ...[
+                    // Display subscribed data
+                    Text(
+                      _subscribedData.isNotEmpty ? _subscribedData : "Waiting for data...",
+                      style: GoogleFonts.monomaniacOne(
+                        fontSize: 50,
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 30),
                     ElevatedButton(
                       onPressed: () => _startAssessment(context),
                       style: ElevatedButton.styleFrom(
