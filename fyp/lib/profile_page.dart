@@ -307,7 +307,9 @@ class _ProfilePageState extends State<ProfilePage> {
                                         appointment: patient['appointment'],
                                       ),
                                     ),
-                                  );
+                                  ).then((_) {
+                                    _fetchPatientRecords(); // Refresh the list after returning from PatientDetailsPage
+                                  });
                                 },
                               ),
                             );
