@@ -25,6 +25,8 @@ class _StartAssessmentPageState extends State<StartAssessmentPage> {
       "http://ec2-18-139-163-163.ap-southeast-1.compute.amazonaws.com:3000/start-assessment";
   static const String _updateAssessmentUrl =
       "http://ec2-18-139-163-163.ap-southeast-1.compute.amazonaws.com:3000/update-assessment";
+  static const String _stopAssessmentUrl =
+      "http://ec2-18-139-163-163.ap-southeast-1.compute.amazonaws.com:3000/stop-assessment";
 
   Future<void> _startAssessment(BuildContext context) async {
     setState(() {
@@ -94,6 +96,40 @@ class _StartAssessmentPageState extends State<StartAssessmentPage> {
     }
   }
 
+  Future<void> _stopAssessment(BuildContext context) async {
+    setState(() {
+      _isProcessing = true;
+    });
+
+    try {
+      final response = await http.post(
+        Uri.parse(_stopAssessmentUrl),
+        headers: {"Content-Type": "application/json"},
+        body: json.encode({"patientId": widget.patientId}),
+      );
+
+      final responseData = json.decode(response.body);
+
+      if (response.statusCode == 200) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(responseData['message'] ?? "Assessment stopped successfully!")),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(responseData['error'] ?? "Failed to stop assessment.")),
+        );
+      }
+    } catch (error) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("An error occurred: $error")),
+      );
+    } finally {
+      setState(() {
+        _isProcessing = false;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -146,6 +182,21 @@ class _StartAssessmentPageState extends State<StartAssessmentPage> {
                     ),
                     const SizedBox(height: 20),
                     ElevatedButton(
+                      onPressed: () => _stopAssessment(context),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.white60,
+                        minimumSize: const Size(double.infinity, 60), // Full width, fixed height
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                      ),
+                      child: Text(
+                        "Stop Assessment",
+                        style: GoogleFonts.monomaniacOne(color: Colors.deepPurple, fontSize: 20, fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    ElevatedButton(
                       onPressed: () => _updateAssessment(context),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.white60,
@@ -155,7 +206,7 @@ class _StartAssessmentPageState extends State<StartAssessmentPage> {
                         ),
                       ),
                       child: Text(
-                        "Mas Lvl prediction",
+                        "Mas Lvl Prediction",
                         style: GoogleFonts.monomaniacOne(color: Colors.deepPurple, fontSize: 20, fontWeight: FontWeight.bold),
                       ),
                     ),
