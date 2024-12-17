@@ -12,9 +12,7 @@ class PatientDetailsPage extends StatefulWidget {
   final String gender;
   final String phoneNum;
   final String email;
-  final int ml;
   final String appointment;
-
 
   const PatientDetailsPage({
     super.key,
@@ -24,7 +22,6 @@ class PatientDetailsPage extends StatefulWidget {
     required this.gender,
     required this.phoneNum,
     required this.email,
-    required this.ml,
     required this.appointment,
   });
 
@@ -33,54 +30,86 @@ class PatientDetailsPage extends StatefulWidget {
 }
 
 class _PatientDetailsPageState extends State<PatientDetailsPage> {
-  late int ml;
   late String appointment;
+  List<ChartData> masLevelData = [];
+  int currentMasLevel = 0;
 
   @override
   void initState() {
     super.initState();
-    ml = widget.ml;
     appointment = widget.appointment;
+    fetchMasLevels();
   }
 
-  Future<bool> saveAppointmentDate(String patientId, String date) async {
-    const apiUrl = 'http://ec2-18-139-163-163.ap-southeast-1.compute.amazonaws.com:3000/save-appointment';
-
+  Future<void> fetchMasLevels() async {
+    const String apiUrl =
+        'http://ec2-18-139-163-163.ap-southeast-1.compute.amazonaws.com:3000/get-maslevels';
     try {
       final response = await http.post(
         Uri.parse(apiUrl),
         headers: {"Content-Type": "application/json"},
-        body: jsonEncode({
-          "patientId": patientId,
-          "appointmentDate": date,
-        }),
+        body: jsonEncode({"patientId": widget.patientID}),
       );
 
       if (response.statusCode == 200) {
-        return true; // Successfully saved
+        final List<dynamic> data = jsonDecode(response.body);
+        setState(() {
+          masLevelData = data
+              .map((entry) => ChartData(entry['date'], entry['level']))
+              .toList();
+          if (masLevelData.isNotEmpty) {
+            currentMasLevel = masLevelData.last.y;
+          }
+        });
       } else {
         print("Error: ${response.body}");
-        return false; // Failed to save
       }
     } catch (e) {
-      print("Error saving appointment: $e");
-      return false;
+      print("Error fetching MAS levels: $e");
     }
   }
 
   Future<void> updateAppointmentDate(String date) async {
-    bool success = await saveAppointmentDate(widget.patientID, date);
-    if (success) {
-      setState(() {
-        appointment = date; // Update the state to reflect the new appointment
-      });
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Appointment date saved successfully!')),
+    const String apiUrl =
+        'http://ec2-18-139-163-163.ap-southeast-1.compute.amazonaws.com:3000/save-appointment';
+    try {
+      final response = await http.post(
+        Uri.parse(apiUrl),
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode({"patientId": widget.patientID, "appointmentDate": date}),
       );
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Failed to save appointment date.')),
-      );
+
+      if (response.statusCode == 200) {
+        setState(() {
+          appointment = date;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Appointment date saved successfully!')),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Failed to save appointment date.')),
+        );
+      }
+    } catch (e) {
+      print("Error saving appointment: $e");
+    }
+  }
+
+  String getPatientAssessment() {
+    switch (currentMasLevel) {
+      case 0:
+        return "Critical condition. Emergency intervention needed.";
+      case 1:
+        return "Severe concerns detected. Immediate action required.";
+      case 2:
+        return "Moderate issues present. Recommend scheduling a follow-up.";
+      case 3:
+        return "Minor irregularities observed. Monitor progress closely.";
+      case 4:
+        return "No issues detected. Patient is in excellent condition.";
+      default:
+        return "Unknown condition. Please review the input data.";
     }
   }
 
@@ -90,7 +119,8 @@ class _PatientDetailsPageState extends State<PatientDetailsPage> {
       backgroundColor: Colors.blueGrey,
       appBar: AppBar(
         backgroundColor: const Color(0xFF00274D),
-        title: Text("Patient: ${widget.name}", style: GoogleFonts.monomaniacOne(color: Colors.white)),
+        title: Text("Patient: ${widget.name}",
+            style: GoogleFonts.monomaniacOne(color: Colors.white)),
         centerTitle: true,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.black),
@@ -103,7 +133,7 @@ class _PatientDetailsPageState extends State<PatientDetailsPage> {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            // Basic Info and Buttons
+            // Patient Info and Set Appointment
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -114,23 +144,22 @@ class _PatientDetailsPageState extends State<PatientDetailsPage> {
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(16),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.grey.withOpacity(0.3),
-                          blurRadius: 6,
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text("Name: ${widget.name}", style: GoogleFonts.monomaniacOne(fontSize: 18)),
-                        Text("Patient ID: ${widget.patientID}", style: GoogleFonts.monomaniacOne(fontSize: 16)),
-                        Text("Age: ${widget.age}", style: GoogleFonts.monomaniacOne(fontSize: 18)),
-                        Text("Gender: ${widget.gender}", style: GoogleFonts.monomaniacOne(fontSize: 16)),
-                        Text("Phone Number: ${widget.phoneNum}", style: GoogleFonts.monomaniacOne(fontSize: 16)),
-                        Text("Email: ${widget.email}", style: GoogleFonts.monomaniacOne(fontSize: 16)),
+                        Text("Name: ${widget.name}",
+                            style: GoogleFonts.monomaniacOne(fontSize: 18)),
+                        Text("Patient ID: ${widget.patientID}",
+                            style: GoogleFonts.monomaniacOne(fontSize: 16)),
+                        Text("Age: ${widget.age}",
+                            style: GoogleFonts.monomaniacOne(fontSize: 18)),
+                        Text("Gender: ${widget.gender}",
+                            style: GoogleFonts.monomaniacOne(fontSize: 16)),
+                        Text("Phone Number: ${widget.phoneNum}",
+                            style: GoogleFonts.monomaniacOne(fontSize: 16)),
+                        Text("Email: ${widget.email}",
+                            style: GoogleFonts.monomaniacOne(fontSize: 16)),
                       ],
                     ),
                   ),
@@ -140,9 +169,10 @@ class _PatientDetailsPageState extends State<PatientDetailsPage> {
                   flex: 1,
                   child: Column(
                     children: [
-                      SizedBox(
-                        height: 55, // Match the height of the Select Appointment box
-                        width: double.infinity, // Match the width of the Select Appointment box
+                      // Start New Assessment Button inside Container
+                      Container(
+                        height: 65, // Adjust height as needed
+                        width: double.infinity, // Adjust width as needed
                         child: ElevatedButton(
                           onPressed: () {
                             Navigator.push(
@@ -153,7 +183,9 @@ class _PatientDetailsPageState extends State<PatientDetailsPage> {
                                   patientName: widget.name,
                                 ),
                               ),
-                            );
+                            ).then((_) {
+                              fetchMasLevels(); // Refresh the list after returning from PatientDetailsPage
+                            });
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: const Color(0xFF00274D),
@@ -163,7 +195,6 @@ class _PatientDetailsPageState extends State<PatientDetailsPage> {
                           ),
                           child: Text(
                             'Start New Assessment',
-                            textAlign: TextAlign.center,
                             style: GoogleFonts.monomaniacOne(
                               fontSize: 16,
                               color: Colors.white,
@@ -172,6 +203,8 @@ class _PatientDetailsPageState extends State<PatientDetailsPage> {
                         ),
                       ),
                       const SizedBox(height: 10),
+
+                      // Set Appointment Container
                       GestureDetector(
                         onTap: () async {
                           DateTime? selectedDate = await showDatePicker(
@@ -188,21 +221,23 @@ class _PatientDetailsPageState extends State<PatientDetailsPage> {
                           }
                         },
                         child: Container(
-                          height: 110,
+                          height: 100,
                           width: double.infinity,
                           decoration: BoxDecoration(
                             color: const Color(0xFF004D79),
                             borderRadius: BorderRadius.circular(16),
-                            border: Border.all(color: Colors.black26),
                           ),
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              const Icon(Icons.calendar_today, color: Colors.white, size: 20),
+                              const Icon(Icons.calendar_today, color: Colors.white, size: 40),
                               const SizedBox(height: 5),
                               Text(
-                                'Select Appointment',
-                                style: GoogleFonts.monomaniacOne(color: Colors.white, fontSize: 14),
+                                "Set Appointment",
+                                style: GoogleFonts.monomaniacOne(
+                                  fontSize: 20,
+                                  color: Colors.white,
+                                ),
                               ),
                             ],
                           ),
@@ -214,9 +249,8 @@ class _PatientDetailsPageState extends State<PatientDetailsPage> {
               ],
             ),
             const SizedBox(height: 10),
-            // MAS Chart and Metrics
+            // MAS Chart and Boxes
             Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Expanded(
                   flex: 2,
@@ -226,35 +260,17 @@ class _PatientDetailsPageState extends State<PatientDetailsPage> {
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: Colors.black26),
                     ),
                     child: SfCartesianChart(
-                      title: ChartTitle(
-                        text: 'MAS Level Progress',
-                        textStyle: GoogleFonts.monomaniacOne(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black,
-                        ),
-                      ),
-                      primaryXAxis: CategoryAxis(
-                        labelStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
-                        title: const AxisTitle(text: 'Date', textStyle: TextStyle(fontSize: 16)),
-                      ),
-                      primaryYAxis: NumericAxis(
-                        labelStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
-                        title: const AxisTitle(text: 'MAS Level', textStyle: TextStyle(fontSize: 16)),
-                      ),
+                      title: ChartTitle(text: 'MAS Level Progress'),
+                      primaryXAxis: CategoryAxis(title: AxisTitle(text: 'Date')),
+                      primaryYAxis: NumericAxis(title: AxisTitle(text: 'Level')),
                       series: <CartesianSeries>[
-                        ColumnSeries<ChartData, String>(
-                          dataSource: [
-                            ChartData('17 Dec 24', ml),
-                            ChartData('17 Jan 25', ml),
-                            ChartData('17 Feb 25', ml),
-                          ],
+                        LineSeries<ChartData, String>(
+                          dataSource: masLevelData,
                           xValueMapper: (ChartData data, _) => data.x,
                           yValueMapper: (ChartData data, _) => data.y,
-                          color: Colors.pink,
+                          dataLabelSettings: const DataLabelSettings(isVisible: true),
                         ),
                       ],
                     ),
@@ -267,39 +283,26 @@ class _PatientDetailsPageState extends State<PatientDetailsPage> {
                     children: [
                       Container(
                         height: 100,
-                        width: double.infinity,
+                        margin: const EdgeInsets.only(bottom: 8.0),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF004D79),
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: Center(
+                          child: Text("Next Appointment: $appointment",
+                              style: GoogleFonts.monomaniacOne(
+                                  fontSize: 24, color: Colors.white)),
+                        ),
+                      ),
+                      Container(
+                        height: 100,
                         decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(16),
-                          border: Border.all(color: Colors.black26),
                         ),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text('$ml', style: GoogleFonts.monomaniacOne(fontSize: 32)),
-                            Text(
-                              'Current\nMAS LEVEL',
-                              textAlign: TextAlign.center,
-                              style: GoogleFonts.monomaniacOne(fontSize: 16),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Container(
-                        height: 100,
-                        width: double.infinity,
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF00274D),
-                          borderRadius: BorderRadius.circular(16),
-                          border: Border.all(color: Colors.black26),
-                        ),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(appointment, style: GoogleFonts.monomaniacOne(color: Colors.white, fontSize: 32)),
-                            Text('Next Appointment', style: GoogleFonts.monomaniacOne(color: Colors.white, fontSize: 16)),
-                          ],
+                        child: Center(
+                          child: Text("Current MAS Level: $currentMasLevel",
+                              style: GoogleFonts.monomaniacOne(fontSize: 24)),
                         ),
                       ),
                     ],
@@ -308,91 +311,50 @@ class _PatientDetailsPageState extends State<PatientDetailsPage> {
               ],
             ),
             const SizedBox(height: 10),
-            // Patient Assessment Box
-            SizedBox(
+            Container(
               height: 140,
-              width: double.infinity,
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(16),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey.withOpacity(0.3),
-                      blurRadius: 6,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                  border: Border.all(color: Colors.black26),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(vertical: 8.0),
-                      decoration: const BoxDecoration(
-                        color: Color(0xFF00274D),
-                        borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(16),
-                          topRight: Radius.circular(16),
-                        ),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: Colors.black26),
+              ),
+              child: Column(
+                children: [
+                  // Label Box
+                  Container(
+                    padding: const EdgeInsets.symmetric(vertical: 8.0),
+                    decoration: const BoxDecoration(
+                      color: Color(0xFF00274D),
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(16),
+                        topRight: Radius.circular(16),
                       ),
+                    ),
+                    child: Center(
                       child: Text(
-                        "Patient Assessment:",
-                        textAlign: TextAlign.center,
+                        "Patient Assessment",
                         style: GoogleFonts.monomaniacOne(
                           fontSize: 18,
                           color: Colors.white,
                         ),
                       ),
                     ),
-                    Container(
-                      padding: const EdgeInsets.all(20.0),
-                      child: Builder(
-                        builder: (context) {
-                          switch (ml) {
-                            case 0:
-                              return Text(
-                                "Critical condition. Emergency intervention needed.",
-                                style: GoogleFonts.monomaniacOne(fontSize: 16, color: Colors.black),
-                                textAlign: TextAlign.center,
-                              );
-                            case 1:
-                              return Text(
-                                "Severe concerns detected. Immediate action required.",
-                                style: GoogleFonts.monomaniacOne(fontSize: 16, color: Colors.black),
-                                textAlign: TextAlign.center,
-                              );
-                            case 2:
-                              return Text(
-                                "Moderate issues present. Recommend scheduling a follow-up.",
-                                style: GoogleFonts.monomaniacOne(fontSize: 16, color: Colors.black),
-                                textAlign: TextAlign.center,
-                              );
-                            case 3:
-                              return Text(
-                                "Minor irregularities observed. Monitor progress closely.",
-                                style: GoogleFonts.monomaniacOne(fontSize: 16, color: Colors.red),
-                                textAlign: TextAlign.center,
-                              );
-                            case 4:
-                              return Text(
-                                "No issues detected. Patient is in excellent condition.",
-                                style: GoogleFonts.monomaniacOne(fontSize: 16, color: Colors.red),
-                                textAlign: TextAlign.center,
-                              );
-                            default:
-                              return Text(
-                                "Unknown case: Please check the input data.",
-                                style: GoogleFonts.monomaniacOne(fontSize: 16, color: Colors.black),
-                                textAlign: TextAlign.center,
-                              );
-                          }
-                        },
+                  ),
+                  // Inner Content Box
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Center(
+                      child: Text(
+                        getPatientAssessment(),
+                        style: GoogleFonts.monomaniacOne(
+                          fontSize: 24,
+                          color: Colors.black,
+                        ),
+                        textAlign: TextAlign.center,
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
           ],
@@ -405,6 +367,5 @@ class _PatientDetailsPageState extends State<PatientDetailsPage> {
 class ChartData {
   final String x;
   final int y;
-
   ChartData(this.x, this.y);
 }

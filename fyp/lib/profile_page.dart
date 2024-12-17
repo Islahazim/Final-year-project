@@ -49,7 +49,6 @@ class _ProfilePageState extends State<ProfilePage> {
               'gender': item['gender'] ?? 'N/A',
               'phoneNum': item['phoneNumber'] ?? 'N/A',
               'email': item['email'] ?? 'N/A',
-              'ml': item['MasLevel'] ?? 'N/A',
               'appointment': item['appointmentDate'] ?? 'N/A',
             };
           }));
@@ -303,7 +302,6 @@ class _ProfilePageState extends State<ProfilePage> {
                                         gender: patient['gender'],
                                         phoneNum: patient['phoneNum'],
                                         email: patient['email'],
-                                        ml: patient['ml'],
                                         appointment: patient['appointment'],
                                       ),
                                     ),
