@@ -99,15 +99,15 @@ class _PatientDetailsPageState extends State<PatientDetailsPage> {
   String getPatientAssessment() {
     switch (currentMasLevel) {
       case 0:
-        return "Critical condition. Emergency intervention needed.";
+        return "No increased tone";
       case 1:
-        return "Severe concerns detected. Immediate action required.";
+        return "Slight increase in tone, with a catch and minimal resistance";
       case 2:
-        return "Moderate issues present. Recommend scheduling a follow-up.";
+        return "More marked increase in tone, but the limb can be flexed easily";
       case 3:
-        return "Minor irregularities observed. Monitor progress closely.";
+        return "Considerable increase in tone, making passive movement difficult";
       case 4:
-        return "No issues detected. Patient is in excellent condition.";
+        return "Limb is rigid in flexion or extension";
       default:
         return "Unknown condition. Please review the input data.";
     }
