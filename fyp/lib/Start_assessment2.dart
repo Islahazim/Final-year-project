@@ -59,11 +59,13 @@ class _StartAssessmentPageState extends State<StartAssessmentPage> {
 
       if (response.statusCode == 200) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(responseData['message'] ?? "Assessment started successfully!")),
+          SnackBar(content: Text(responseData['message'] ?? "Assessment started successfully!"),
+              backgroundColor: Colors.green),
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(responseData['error'] ?? "Failed to start assessment.")),
+          SnackBar(content: Text(responseData['error'] ?? "Failed to start assessment."),
+              backgroundColor: Colors.green),
         );
       }
     } catch (error) {
@@ -93,11 +95,13 @@ class _StartAssessmentPageState extends State<StartAssessmentPage> {
 
       if (response.statusCode == 200) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(responseData['message'] ?? "Assessment updated successfully!")),
+          SnackBar(content: Text(responseData['message'] ?? "Assessment updated successfully!"),
+              backgroundColor: Colors.green),
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(responseData['error'] ?? "Failed to update assessment.")),
+          SnackBar(content: Text(responseData['error'] ?? "Failed to update assessment."),
+              backgroundColor: Colors.red),
         );
       }
     } catch (error) {
@@ -127,7 +131,8 @@ class _StartAssessmentPageState extends State<StartAssessmentPage> {
 
       if (response.statusCode == 200) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(responseData['message'] ?? "Assessment stopped successfully!")),
+          SnackBar(content: Text(responseData['message'] ?? "Assessment stopped successfully!"),
+              backgroundColor: Colors.green),
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(

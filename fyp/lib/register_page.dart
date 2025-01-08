@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
+
 class RegisterPage extends StatelessWidget {
   const RegisterPage({super.key});
 
@@ -15,7 +16,8 @@ class RegisterPage extends StatelessWidget {
     final doctorIDController = TextEditingController(); // New controller for Doctor ID
 
     Future<void> registerUser() async {
-      final apiUrl = 'http://ec2-18-139-163-163.ap-southeast-1.compute.amazonaws.com:3000/register'; // Replace with your EC2 URL
+      final apiUrl =
+          'http://ec2-18-139-163-163.ap-southeast-1.compute.amazonaws.com:3000/register'; // Replace with your EC2 URL
       final user = {
         "name": nameController.text,
         "email": emailController.text,
@@ -32,20 +34,29 @@ class RegisterPage extends StatelessWidget {
         );
 
         if (response.statusCode == 200) {
-          final data = jsonDecode(response.body);
+          // Success Response
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text("Registration Successful! ID: ${data['user_id']}")),
+            const SnackBar(
+              content: Text("Registration Successful!"),
+              backgroundColor: Colors.green,
+            ),
           );
-          Navigator.pop(context); // Navigate back to login
+          Navigator.pop(context); // Navigate back to the login page
         } else {
           final error = jsonDecode(response.body);
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text("Error: ${error['detail']}")),
+            SnackBar(
+              content: Text("Error: ${error['detail']}"),
+              backgroundColor: Colors.red,
+            ),
           );
         }
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Registration failed: $e")),
+          SnackBar(
+            content: Text("Registration failed: $e"),
+            backgroundColor: Colors.red,
+          ),
         );
       }
     }
